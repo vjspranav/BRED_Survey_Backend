@@ -49,12 +49,19 @@ router.post("/register", function (req, res, next) {
         content_type: least_used,
         gender,
       });
-      user.save();
-      // Send user_id and content_type to client
-      res.send({
-        user_id: user._id,
-        content_type: least_used,
-      });
+      user
+        .save()
+        .then(() => {
+          // Send user_id and content_type to client
+          res.status(200).send({
+            user_id: user._id,
+            content_type: least_used,
+          });
+        })
+        .catch((err) => {
+          console.log(err);
+          res.status(400).send({ message: "failed" });
+        });
     }
   });
 });
@@ -65,11 +72,16 @@ router.post("/submit", function (req, res, next) {
   const user_id = req.body.user_id;
   const time_taken = req.body.time_taken;
   const answers = req.body.answers;
+  if (!user_id || !time_taken || !answers) {
+    res.status(400).send({
+      message: "failed. User_id, Time_taken or Answers not provided",
+    });
+  }
   // Get user from db
   User.findById(user_id, function (err, user) {
     if (err) {
       console.log(err);
-    } else {
+    } else if (user) {
       // Update user with new answers and time_taken
       user.answers = answers;
       user.time_taken = time_taken;
@@ -77,6 +89,53 @@ router.post("/submit", function (req, res, next) {
       // Send success message to client
       res.send({
         success: true,
+      });
+    } else {
+      res.status(400).send({
+        message: "failed. User not found",
+      });
+    }
+  });
+});
+
+// Get user details by id
+router.get("/user/:id", function (req, res, next) {
+  const id = req.params.id;
+  if (!id) {
+    res.status(400).send({
+      message: "failed. User_id not provided",
+    });
+  }
+  // Get user from db
+  User.findById(id, function (err, user) {
+    if (err) {
+      console.log(err);
+    } else if (user) {
+      // Send user details to client
+      res.send({
+        user: user,
+      });
+    } else {
+      res.status(400).send({
+        message: "failed. User not found",
+      });
+    }
+  });
+});
+
+// Get all users
+router.get("/users", function (req, res, next) {
+  // Get all users from db
+  User.find({}, function (err, users) {
+    if (err) {
+      console.log(err);
+      res.status(400).send({
+        message: "failed. Users not found",
+      });
+    } else {
+      // Send users to client
+      res.send({
+        users: users,
       });
     }
   });
