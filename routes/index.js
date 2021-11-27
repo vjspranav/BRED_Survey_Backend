@@ -13,7 +13,7 @@ router.post("/register", function (req, res, next) {
   const profession = req.body.profession;
   const gender = req.body.gender;
   if (!age || !profession || !gender) {
-    res.status(400).send({
+    return res.status(400).send({
       message: "failed. Age, Profession or Gender not provided",
     });
   }
@@ -74,7 +74,7 @@ router.post("/submit", function (req, res, next) {
   const time_taken = req.body.time_taken;
   const answers = req.body.answers;
   if (!user_id || !time_taken || !answers) {
-    res.status(400).send({
+    return res.status(400).send({
       message: "failed. User_id, Time_taken or Answers not provided",
     });
   }
