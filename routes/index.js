@@ -21,6 +21,7 @@ router.post("/register", function (req, res, next) {
   User.find({}, function (err, users) {
     if (err) {
       console.log(err);
+      res.status(400).send({ failed: err });
     } else {
       let ct = [];
       users.forEach(function (user) {
@@ -81,6 +82,7 @@ router.post("/submit", function (req, res, next) {
   User.findById(user_id, function (err, user) {
     if (err) {
       console.log(err);
+      res.status(400).send({ failed: err });
     } else if (user) {
       // Update user with new answers and time_taken
       user.answers = answers;
@@ -110,6 +112,7 @@ router.get("/user/:id", function (req, res, next) {
   User.findById(id, function (err, user) {
     if (err) {
       console.log(err);
+      res.status(400).send({ failed: err });
     } else if (user) {
       // Send user details to client
       res.send({
